@@ -1,0 +1,61 @@
+{
+  "timezone": "America/Chicago",
+  "poll_interval_seconds": 60,
+  "state_db_path": "data/fleet_bot.sqlite3",
+  "startup_suppresses_arrival_alerts": true,
+  "telegram": {
+    "bot_token_env": "TELEGRAM_BOT_TOKEN",
+    "chat_id_env": "TELEGRAM_CHAT_ID"
+  },
+  "samsara": {
+    "api_token_env": "SAMSARA_API_TOKEN",
+    "base_url": "https://api.samsara.com",
+    "stats_types": [
+      "gps",
+      "obdOdometerMeters",
+      "engineHours",
+      "oilLifeRemainingMilliPercent"
+    ],
+    "maintenance_alert_configuration_ids": []
+  },
+  "arrival_alerts": {
+    "radius_miles": 1.0,
+    "confirmation_seconds": 180,
+    "cooldown_seconds": 1800,
+    "require_speed_below_mph": 10,
+    "locations": [
+      {
+        "id": "lemont_yard",
+        "name": "Lemont Yard",
+        "latitude": 41.0,
+        "longitude": -88.0
+      },
+      {
+        "id": "romeoville_shop",
+        "name": "Romeoville Shop",
+        "latitude": 41.0,
+        "longitude": -88.0
+      },
+      {
+        "id": "mokena_shop",
+        "name": "Mokena Shop",
+        "latitude": 41.0,
+        "longitude": -88.0
+      }
+    ]
+  },
+  "oil_change_alerts": {
+    "enabled": true,
+    "cooldown_seconds": 259200,
+    "alert_keywords": [
+      "oil change",
+      "scheduled maintenance",
+      "scheduled maintenance by odometer",
+      "scheduled maintenance by engine hours",
+      "oil life"
+    ],
+    "oil_life_due_pct": 5,
+    "internal_interval_miles": 25000,
+    "last_oil_changes_path": "data/last_oil_changes.example.json"
+  }
+}
