@@ -50,6 +50,13 @@ def load_config(path: str) -> dict[str, Any]:
     return config
 
 
+def _env_bool(name: str) -> Optional[bool]:
+    value = os.environ.get(name)
+    if value is None:
+        return None
+    return value.strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
 def apply_env_overrides(config: dict[str, Any]) -> None:
     for location in config["arrival_alerts"]["locations"]:
         prefix = f"FLEET_LOCATION_{location['id'].upper()}"
@@ -72,6 +79,10 @@ def apply_env_overrides(config: dict[str, Any]) -> None:
     poll_interval = os.environ.get("FLEET_POLL_INTERVAL_SECONDS")
     if poll_interval:
         config["poll_interval_seconds"] = int(poll_interval)
+
+    oil_enabled = _env_bool("FLEET_OIL_CHANGE_ALERTS_ENABLED")
+    if oil_enabled is not None:
+        config.setdefault("oil_change_alerts", {})["enabled"] = oil_enabled
 
 
 def env_value(config: dict[str, Any], section: str, key: str) -> str:
@@ -280,7 +291,7 @@ class FleetTelegramBot:
             existing = self.store.get_cooldown("oil_change", truck.id)
             if existing and existing["cycle_key"] == cycle_key and now - int(existing["last_sent_at"]) < cooldown_seconds:
                 continue
-            self.telegram.send_message(f"🛢️ Truck {truck.number} is due for oil change.")
+            self.telegram.send_message(f"Truck {truck.number} is due for oil change.")
             self.store.set_cooldown("oil_change", truck.id, "", now, cycle_key)
 
     def _inside_location(self, truck: TruckSnapshot, location: Location) -> bool:
@@ -295,8 +306,8 @@ class FleetTelegramBot:
 
     def _arrival_message(self, truck: TruckSnapshot, location: Location) -> str:
         if truck.trailer_number:
-            return f"🚛 Truck {truck.number} with trailer {truck.trailer_number} arrived at {location.name}."
-        return f"🚛 Truck {truck.number} arrived at {location.name}."
+            return f"Truck {truck.number} with trailer {truck.trailer_number} arrived at {location.name}."
+        return f"Truck {truck.number} arrived at {location.name}."
 
     def _oil_due_from_samsara_incidents(self, now: int) -> dict[str, str]:
         config = self.config["samsara"]
