@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import time
 from typing import Any
+from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
@@ -29,6 +30,12 @@ class JsonHttpClient:
         try:
             with urlopen(req, timeout=self.timeout_seconds) as response:
                 raw = response.read().decode("utf-8")
+        except HTTPError as exc:
+            error_body = exc.read().decode("utf-8", errors="replace")
+            detail = f"HTTP Error {exc.code}: {exc.reason}"
+            if error_body:
+                detail = f"{detail}; response={error_body}"
+            raise HttpError(detail) from exc
         except Exception as exc:  # urllib exceptions vary by failure mode.
             raise HttpError(str(exc)) from exc
         return json.loads(raw) if raw else {}
