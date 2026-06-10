@@ -12,9 +12,7 @@
     "base_url": "https://api.samsara.com",
     "stats_types": [
       "gps",
-      "obdOdometerMeters",
-      "engineHours",
-      "oilLifeRemainingMilliPercent"
+      "obdOdometerMeters"
     ],
     "maintenance_alert_configuration_ids": []
   },
